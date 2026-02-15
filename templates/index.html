@@ -349,5 +349,235 @@ Mulheres ≤170 U/L</div></div>
             </article>
         </section>
     </main>
+
+    <script>
+        (function () {
+            const headerFields = Array.from(document.querySelectorAll('.header-grid .field'));
+            const getFieldInputByLabel = (labelText) => {
+                const field = headerFields.find((item) => {
+                    const label = item.querySelector('label');
+                    return label && label.textContent.trim().toLowerCase() === labelText.toLowerCase();
+                });
+                return field ? field.querySelector('input') : null;
+            };
+
+            const formatDateBR = (date) => {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            };
+
+            const formatTimeBR = (date) => {
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${hours}:${minutes}`;
+            };
+
+            const toISODate = (date) => {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${year}-${month}-${day}`;
+            };
+
+            const dateInput = getFieldInputByLabel('Data');
+            const timeInput = getFieldInputByLabel('Horário');
+            const now = new Date();
+
+            if (dateInput && !dateInput.value) {
+                dateInput.value = toISODate(now);
+            }
+
+            if (timeInput && !timeInput.value) {
+                timeInput.value = formatTimeBR(now);
+            }
+
+            const headerCard = document.querySelector('.header-card');
+            const generateButton = document.createElement('button');
+            generateButton.type = 'button';
+            generateButton.textContent = 'Gerar PDF';
+            generateButton.setAttribute('aria-label', 'Gerar PDF');
+
+            if (headerCard) {
+                headerCard.appendChild(generateButton);
+            }
+
+            const examCategoryMatchers = [
+                { regex: /troponina|ck\s*-?mb|marcadores\s*card/i, category: 'Marcadores Cardíacos' },
+                { regex: /hemograma/i, category: 'Hemograma' },
+                { regex: /urina/i, category: 'Urina Tipo I' },
+                { regex: /eletr[oó]litos/i, category: 'Eletrólitos' },
+                { regex: /bioqu[ií]mica|fun[çc][aã]o\s+hep[aá]tica/i, category: 'Bioquímica' },
+                { regex: /gasometria/i, category: 'Gasometria' }
+            ];
+
+            const pickCategory = (title) => {
+                const match = examCategoryMatchers.find((item) => item.regex.test(title));
+                return match ? match.category : title;
+            };
+
+            const sanitize = (value) =>
+                String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+
+            const formatDateValue = (value) => {
+                if (!value || !value.includes('-')) {
+                    return value || '';
+                }
+                const parts = value.split('-');
+                if (parts.length !== 3) {
+                    return value;
+                }
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            };
+
+            const collectHeaderData = () => {
+                return headerFields
+                    .map((field) => {
+                        const label = field.querySelector('label');
+                        const input = field.querySelector('input');
+                        if (!label || !input) {
+                            return null;
+                        }
+                        const raw = input.value.trim();
+                        if (!raw) {
+                            return null;
+                        }
+                        const isDate = input.type === 'date';
+                        return {
+                            label: label.textContent.trim(),
+                            value: isDate ? formatDateValue(raw) : raw
+                        };
+                    })
+                    .filter(Boolean);
+            };
+
+            const collectExamData = () => {
+                const sections = Array.from(document.querySelectorAll('.exam-card')).map((card) => {
+                    const title = card.querySelector('.card-title')?.textContent.trim() || 'Exame';
+                    const rows = Array.from(card.querySelectorAll('.row'))
+                        .map((row) => {
+                            const param = row.querySelector('.param')?.textContent.trim() || '';
+                            const resultInput = row.querySelector('.result input');
+                            const result = resultInput ? resultInput.value.trim() : '';
+                            if (!result) {
+                                return null;
+                            }
+                            const ref = row.querySelector('.ref')?.textContent.trim() || '';
+                            return { param, result, ref };
+                        })
+                        .filter(Boolean);
+
+                    if (!rows.length) {
+                        return null;
+                    }
+
+                    return {
+                        category: pickCategory(title),
+                        title,
+                        rows
+                    };
+                }).filter(Boolean);
+
+                const grouped = sections.reduce((acc, section) => {
+                    if (!acc[section.category]) {
+                        acc[section.category] = [];
+                    }
+                    acc[section.category].push(section);
+                    return acc;
+                }, {});
+
+                return grouped;
+            };
+
+            const buildPdfHtml = () => {
+                const headerData = collectHeaderData();
+                const groupedExams = collectExamData();
+                const generatedAt = `Emitido em ${formatDateBR(new Date())} às ${formatTimeBR(new Date())}`;
+
+                const headerHtml = headerData.length
+                    ? `<section><h2>Dados do Paciente</h2><div class="meta">${headerData
+                          .map((item) => `<p><strong>${sanitize(item.label)}:</strong> ${sanitize(item.value)}</p>`)
+                          .join('')}</div></section>`
+                    : '';
+
+                const sectionsHtml = Object.entries(groupedExams)
+                    .map(([category, sections]) => {
+                        const examsHtml = sections
+                            .map((exam) => `
+                                <article>
+                                    <h4>${sanitize(exam.title)}</h4>
+                                    <table>
+                                        <thead>
+                                            <tr><th>Parâmetro</th><th>Resultado</th><th>Referência</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            ${exam.rows
+                                                .map(
+                                                    (row) => `
+                                                <tr>
+                                                    <td>${sanitize(row.param)}</td>
+                                                    <td>${sanitize(row.result)}</td>
+                                                    <td>${sanitize(row.ref)}</td>
+                                                </tr>`
+                                                )
+                                                .join('')}
+                                        </tbody>
+                                    </table>
+                                </article>`)
+                            .join('');
+                        return `<section><h3>${sanitize(category)}</h3>${examsHtml}</section>`;
+                    })
+                    .join('');
+
+                return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Laudo Laboratorial</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 24px; color: #111; }
+h1 { text-align: center; margin-bottom: 8px; }
+p { margin: 3px 0; }
+h2, h3, h4 { margin: 14px 0 8px; }
+h3 { border-bottom: 1px solid #bbb; padding-bottom: 4px; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 12px; text-align: left; vertical-align: top; }
+.meta { margin-bottom: 10px; }
+.footer { margin-top: 18px; font-size: 11px; color: #444; }
+@media print { body { margin: 12mm; } }
+</style>
+</head>
+<body>
+<h1>Laudo Laboratorial</h1>
+${headerHtml}
+${sectionsHtml || '<p>Nenhum exame preenchido.</p>'}
+<p class="footer">${sanitize(generatedAt)}</p>
+<script>
+window.onload = function() {
+    window.print();
+};
+<\/script>
+</body>
+</html>`;
+            };
+
+            generateButton.addEventListener('click', () => {
+                const printWindow = window.open('', '_blank');
+                if (!printWindow) {
+                    return;
+                }
+                printWindow.document.open();
+                printWindow.document.write(buildPdfHtml());
+                printWindow.document.close();
+            });
+        })();
+    </script>
+
 </body>
 </html>
