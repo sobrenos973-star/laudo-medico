@@ -4,57 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laudo Laboratorial</title>
+
     <style>
         :root {
-            --bg: #eef2f6;
+            --bg: #d9e6f2;
             --surface: #ffffff;
-            --surface-alt: #f8fafc;
-            --border: #d9e2ec;
-            --text: #1f2a37;
-            --muted: #5b6b7c;
-            --primary: #2e5b87;
-            --primary-soft: #eaf2fa;
-            --shadow: 0 8px 20px rgba(29, 53, 87, 0.08);
+            --border: #b7cce2;
+            --text: #14202b;
+            --muted: #5b6f82;
+
+            --primary: #1c4e80;
+            --primary-strong: #123555;
+            --accent: #2f7dc1;
+            --soft: #e9f2fb;
+
+            --shadow: 0 14px 35px rgba(10, 45, 80, 0.18);
         }
 
         * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
-            color: var(--text);
+            font-family: "Segoe UI", "Inter", Arial, sans-serif;
             background: var(--bg);
-            line-height: 1.4;
+            color: var(--text);
         }
 
         .page {
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
-            padding: 24px 16px 40px;
+            padding: 30px 20px 60px;
         }
 
         .header-card {
             background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 22px;
+            border-radius: 18px;
+            padding: 26px;
             box-shadow: var(--shadow);
-            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 26px;
         }
 
         .title {
-            margin: 0 0 18px;
+            margin: 0 0 24px;
             text-align: center;
-            font-size: 1.75rem;
-            letter-spacing: 0.04em;
-            color: var(--primary);
-            font-weight: 700;
+            font-size: 2rem;
+            letter-spacing: 0.08em;
+            color: var(--primary-strong);
         }
 
         .header-grid {
             display: grid;
             grid-template-columns: repeat(6, minmax(140px, 1fr));
-            gap: 12px;
+            gap: 16px;
         }
 
         .field {
@@ -63,50 +65,55 @@
             gap: 6px;
         }
 
-        .field label {
-            font-size: 0.76rem;
+        label {
+            font-size: 0.72rem;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.05em;
             color: var(--muted);
             font-weight: 600;
         }
 
-        .field input {
-            width: 100%;
+        input, select {
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 10px 11px;
-            font-size: 0.92rem;
-            background: var(--surface-alt);
-            color: var(--text);
+            font-size: 0.9rem;
+            background: #f4f8fd;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
         }
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 20px;
         }
 
         .exam-card {
             background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: 18px;
             box-shadow: var(--shadow);
+            border: 1px solid var(--border);
             overflow: hidden;
         }
 
         .card-title {
             margin: 0;
-            padding: 12px 16px;
-            background: var(--primary-soft);
-            color: var(--primary);
-            font-size: 0.96rem;
-            letter-spacing: 0.02em;
+            padding: 16px 20px;
+            font-size: 1.05rem;
             font-weight: 700;
-            border-bottom: 1px solid var(--border);
+            letter-spacing: 0.04em;
+            color: white;
+            background: linear-gradient(135deg, var(--primary-strong), var(--accent));
         }
 
-        .card-content { padding: 12px 14px 14px; }
+        .card-content {
+            padding: 14px 18px 18px;
+        }
 
         .table-header,
         .row {
@@ -117,237 +124,504 @@
         }
 
         .table-header {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 700;
-            letter-spacing: 0.04em;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
             color: var(--muted);
-            margin-bottom: 8px;
-            padding: 0 2px;
+            margin-bottom: 6px;
         }
 
         .row {
-            padding: 8px 2px;
-            border-top: 1px dashed #e5ebf2;
+            padding: 10px 0;
+            border-top: 1px solid #edf2f7;
         }
 
         .row:first-of-type { border-top: none; }
 
         .param {
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             font-weight: 500;
-            color: var(--text);
-        }
-
-        .result input {
-            width: 100%;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 9px;
-            font-size: 0.86rem;
-            background: #fbfdff;
-            color: var(--text);
         }
 
         .ref {
-            font-size: 0.8rem;
-            color: #475568;
+            font-size: 0.78rem;
+            color: #3c5166;
             white-space: pre-line;
+            background: var(--soft);
+            padding: 6px 8px;
+            border-radius: 8px;
         }
 
+        select { background: white; }
+
         @media (max-width: 1100px) {
-            .header-grid { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+            .header-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
         @media (max-width: 760px) {
             .header-grid { grid-template-columns: 1fr 1fr; }
             .cards-grid { grid-template-columns: 1fr; }
-            .table-header,
-            .row { grid-template-columns: 1fr; gap: 6px; }
             .table-header { display: none; }
-            .row { border-top: 1px solid #e5ebf2; padding: 10px 2px; }
-            .param::before { content: "Parâmetro: "; color: var(--muted); font-weight: 600; }
-            .result::before { content: "Resultado"; display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; font-weight: 700; }
-            .ref::before { content: "Referência: "; color: var(--muted); font-weight: 700; }
+            .table-header, .row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
+
 <body>
-    <main class="page">
-        <section class="header-card">
-            <h1 class="title">LAUDO LABORATORIAL</h1>
-            <div class="header-grid">
-                <div class="field"><label>Nome do paciente</label><input type="text"></div>
-                <div class="field"><label>Data de nascimento</label><input type="date"></div>
-                <div class="field"><label>Atendimento</label><input type="text"></div>
-                <div class="field"><label>Data</label><input type="date"></div>
-                <div class="field"><label>Horário</label><input type="time"></div>
-                <div class="field"><label>Liberado por</label><input type="text"></div>
+<main class="page">
+
+    <section class="header-card">
+        <h1 class="title">LAUDO LABORATORIAL</h1>
+
+        <div class="header-grid">
+            <div class="field"><label>Nome do paciente</label><input type="text"></div>
+            <div class="field"><label>Data de nascimento</label><input type="date"></div>
+            <div class="field"><label>Atendimento</label><input type="text"></div>
+            <div class="field"><label>Data</label><input type="date"></div>
+            <div class="field"><label>Horário</label><input type="time"></div>
+            <div class="field"><label>Liberado por</label><input type="text"></div>
+        </div>
+    </section>
+
+    <section class="cards-grid">
+
+        <!-- HEMOGRAMA ADULTO -->
+        <article class="exam-card">
+            <h2 class="card-title">HEMOGRAMA – ADULTO</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
+
+                <div class="row"><div class="param">Eritrócitos</div><div><input></div><div class="ref">Homens: 4,5 – 5,5 milhões/mm³
+Mulheres: 3,8 – 4,9 milhões/mm³</div></div>
+
+                <div class="row"><div class="param">Hemoglobina</div><div><input></div><div class="ref">Homens: 13 – 17 g/dL
+Mulheres: 12 – 15 g/dL</div></div>
+
+                <div class="row"><div class="param">Hematócrito</div><div><input></div><div class="ref">Homens: 40 – 54%
+Mulheres: 36 – 47%</div></div>
+
+                <div class="row"><div class="param">VCM</div><div><input></div><div class="ref">83 – 101 fL</div></div>
+                <div class="row"><div class="param">HCM</div><div><input></div><div class="ref">27 – 32 pg</div></div>
+                <div class="row"><div class="param">CHCM</div><div><input></div><div class="ref">31,5 – 34,5%</div></div>
+                <div class="row"><div class="param">RDW</div><div><input></div><div class="ref">11,0 – 14,8%</div></div>
+
+                <div class="row"><div class="param">Leucócitos</div><div><input></div><div class="ref">4.000 – 10.000/mm³</div></div>
+                <div class="row"><div class="param">Bastonetes</div><div><input></div><div class="ref">0 – 4%</div></div>
+                <div class="row"><div class="param">Segmentados</div><div><input></div><div class="ref">50 – 62%</div></div>
+                <div class="row"><div class="param">Eosinófilos</div><div><input></div><div class="ref">1 – 3%</div></div>
+                <div class="row"><div class="param">Monócitos</div><div><input></div><div class="ref">2 – 7%</div></div>
+                <div class="row"><div class="param">Linfócitos</div><div><input></div><div class="ref">20 – 36%</div></div>
+
+                <div class="row"><div class="param">Plaquetas</div><div><input></div><div class="ref">150.000 – 400.000/mm³</div></div>
             </div>
-        </section>
+        </article>
 
-        <section class="cards-grid">
-            <article class="exam-card">
-                <h2 class="card-title">HEMOGRAMA</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">Eritrócitos</div><div class="result"><input type="text"></div><div class="ref">Adulto Homens: 4,5 – 5,5 milhões/mm³
-Adulto Mulheres: 3,8 – 4,9 milhões/mm³
-Recém-nascido: 4,0 – 5,6 milhões/mm³</div></div>
-                    <div class="row"><div class="param">Hemoglobina</div><div class="result"><input type="text"></div><div class="ref">Adulto Homens: 13 – 17 g/dL
-Adulto Mulheres: 12 – 15 g/dL
-Recém-nascido: 14 – 24 g/dL</div></div>
-                    <div class="row"><div class="param">Hematócrito</div><div class="result"><input type="text"></div><div class="ref">Adulto Homens: 40 – 54%
-Adulto Mulheres: 36 – 47%
-Recém-nascido: 44 – 62%</div></div>
-                    <div class="row"><div class="param">VCM</div><div class="result"><input type="text"></div><div class="ref">Adulto: 83 – 101 fL
-Recém-nascido: 96 – 108 fL</div></div>
-                    <div class="row"><div class="param">HCM</div><div class="result"><input type="text"></div><div class="ref">Adulto: 27 – 32 pg
-Recém-nascido: 27 – 34 pg</div></div>
-                    <div class="row"><div class="param">CHCM</div><div class="result"><input type="text"></div><div class="ref">Adulto: 31,5 – 34,5%
-Recém-nascido: 31 – 37%</div></div>
-                    <div class="row"><div class="param">RDW</div><div class="result"><input type="text"></div><div class="ref">Adulto: 11,0 – 14,8%
-Recém-nascido: 15,5 – 20%</div></div>
-                    <div class="row"><div class="param">Leucócitos</div><div class="result"><input type="text"></div><div class="ref">4.000 – 10.000/mm³</div></div>
-                    <div class="row"><div class="param">Bastonetes</div><div class="result"><input type="text"></div><div class="ref">0 – 4%</div></div>
-                    <div class="row"><div class="param">Segmentados</div><div class="result"><input type="text"></div><div class="ref">50 – 62%</div></div>
-                    <div class="row"><div class="param">Eosinófilos</div><div class="result"><input type="text"></div><div class="ref">1 – 3%</div></div>
-                    <div class="row"><div class="param">Monócitos</div><div class="result"><input type="text"></div><div class="ref">2 – 7%</div></div>
-                    <div class="row"><div class="param">Linfócitos</div><div class="result"><input type="text"></div><div class="ref">20 – 36%</div></div>
-                    <div class="row"><div class="param">Plaquetas</div><div class="result"><input type="text"></div><div class="ref">150.000 – 400.000/mm³</div></div>
-                </div>
-            </article>
+        <!-- HEMOGRAMA RN -->
+        <article class="exam-card">
+            <h2 class="card-title">HEMOGRAMA – RECÉM-NASCIDO</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
 
-            <article class="exam-card">
-                <h2 class="card-title">URINA TIPO I</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">Aspecto</div><div class="result"><input type="text"></div><div class="ref">Límpido</div></div>
-                    <div class="row"><div class="param">Cor</div><div class="result"><input type="text"></div><div class="ref">Amarelo</div></div>
-                    <div class="row"><div class="param">Densidade</div><div class="result"><input type="text"></div><div class="ref">1.010 – 1.030</div></div>
-                    <div class="row"><div class="param">pH</div><div class="result"><input type="text"></div><div class="ref">4,5 – 8,0</div></div>
-                    <div class="row"><div class="param">Proteínas</div><div class="result"><input type="text"></div><div class="ref">Ausente</div></div>
-                    <div class="row"><div class="param">Glicose</div><div class="result"><input type="text"></div><div class="ref">Negativo</div></div>
-                    <div class="row"><div class="param">Cetonas</div><div class="result"><input type="text"></div><div class="ref">Ausente</div></div>
-                    <div class="row"><div class="param">Nitrito</div><div class="result"><input type="text"></div><div class="ref">Negativo</div></div>
-                    <div class="row"><div class="param">Leucócitos</div><div class="result"><input type="text"></div><div class="ref">até 7.000/mL</div></div>
-                    <div class="row"><div class="param">Hemácias</div><div class="result"><input type="text"></div><div class="ref">até 5.000/mL</div></div>
-                    <div class="row"><div class="param">Cilindros</div><div class="result"><input type="text"></div><div class="ref">Ausente</div></div>
-                </div>
-            </article>
+                <div class="row"><div class="param">Eritrócitos</div><div><input></div><div class="ref">4,0 – 5,6 milhões/mm³</div></div>
+                <div class="row"><div class="param">Hemoglobina</div><div><input></div><div class="ref">14 – 24 g/dL</div></div>
+                <div class="row"><div class="param">Hematócrito</div><div><input></div><div class="ref">44 – 62%</div></div>
+                <div class="row"><div class="param">VCM</div><div><input></div><div class="ref">96 – 108 fL</div></div>
+                <div class="row"><div class="param">HCM</div><div><input></div><div class="ref">27 – 34 pg</div></div>
+                <div class="row"><div class="param">CHCM</div><div><input></div><div class="ref">31 – 37%</div></div>
+                <div class="row"><div class="param">RDW</div><div><input></div><div class="ref">15,5 – 20%</div></div>
+            </div>
+        </article>
 
-            <article class="exam-card">
-                <h2 class="card-title">BIOQUÍMICA</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">Ureia</div><div class="result"><input type="text"></div><div class="ref">15 – 40 mg/dL</div></div>
-                    <div class="row"><div class="param">Creatinina</div><div class="result"><input type="text"></div><div class="ref">0,4 – 1,2 mg/dL</div></div>
-                    <div class="row"><div class="param">Glicose jejum</div><div class="result"><input type="text"></div><div class="ref">65 – 99 mg/dL</div></div>
-                    <div class="row"><div class="param">Ácido úrico</div><div class="result"><input type="text"></div><div class="ref">Homens: 2,5 – 7,0 mg/dL
+        <!-- URINA -->
+        <article class="exam-card">
+            <h2 class="card-title">URINA TIPO I (EAS)</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
+
+                <div class="row"><div class="param">Aspecto</div><div><input></div><div class="ref">Límpido</div></div>
+                <div class="row"><div class="param">Cor</div><div><input></div><div class="ref">Amarelo</div></div>
+                <div class="row"><div class="param">Densidade</div><div><input></div><div class="ref">1.010 – 1.030</div></div>
+                <div class="row"><div class="param">pH</div><div><input></div><div class="ref">4,5 – 8,0</div></div>
+
+                <div class="row"><div class="param">Proteínas</div><div><input></div><div class="ref">Ausente</div></div>
+                <div class="row"><div class="param">Glicose</div><div><input></div><div class="ref">Negativo</div></div>
+                <div class="row"><div class="param">Cetonas</div><div><input></div><div class="ref">Ausente</div></div>
+                <div class="row"><div class="param">Nitrito</div><div><input></div><div class="ref">Negativo</div></div>
+
+                <div class="row"><div class="param">Leucócitos</div><div><input></div><div class="ref">até 7.000/mL</div></div>
+                <div class="row"><div class="param">Hemácias</div><div><input></div><div class="ref">até 5.000/mL</div></div>
+                <div class="row"><div class="param">Cilindros</div><div><input></div><div class="ref">Ausente</div></div>
+            </div>
+        </article>
+
+        <!-- BIOQUÍMICA -->
+        <article class="exam-card">
+            <h2 class="card-title">BIOQUÍMICA</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
+
+                <div class="row"><div class="param">Ureia</div><div><input></div><div class="ref">15 – 40 mg/dL</div></div>
+                <div class="row"><div class="param">Creatinina</div><div><input></div><div class="ref">0,4 – 1,2 mg/dL</div></div>
+                <div class="row"><div class="param">Glicose jejum</div><div><input></div><div class="ref">65 – 99 mg/dL</div></div>
+                <div class="row"><div class="param">Ácido úrico</div><div><input></div><div class="ref">Homens: 2,5 – 7,0 mg/dL
 Mulheres: 1,5 – 6,0 mg/dL</div></div>
-                </div>
-            </article>
+            </div>
+        </article>
 
-            <article class="exam-card">
-                <h2 class="card-title">ELETRÓLITOS</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">Sódio</div><div class="result"><input type="text"></div><div class="ref">136 – 145 mEq/L</div></div>
-                    <div class="row"><div class="param">Potássio</div><div class="result"><input type="text"></div><div class="ref">3,5 – 5,1 mEq/L</div></div>
-                    <div class="row"><div class="param">Cloro</div><div class="result"><input type="text"></div><div class="ref">98 – 107 mEq/L</div></div>
-                    <div class="row"><div class="param">Cálcio</div><div class="result"><input type="text"></div><div class="ref">8,8 – 11 mg/dL</div></div>
-                    <div class="row"><div class="param">Magnésio</div><div class="result"><input type="text"></div><div class="ref">1,9 – 2,5 mg/dL</div></div>
-                </div>
-            </article>
+        <!-- ELETRÓLITOS -->
+        <article class="exam-card">
+            <h2 class="card-title">ELETRÓLITOS</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
 
-            <article class="exam-card">
-                <h2 class="card-title">FUNÇÃO HEPÁTICA</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">TGO (AST)</div><div class="result"><input type="text"></div><div class="ref">Homens ≤39 U/L
+                <div class="row"><div class="param">Sódio</div><div><input></div><div class="ref">136 – 145 mEq/L</div></div>
+                <div class="row"><div class="param">Potássio</div><div><input></div><div class="ref">3,5 – 5,1 mEq/L</div></div>
+                <div class="row"><div class="param">Cloro</div><div><input></div><div class="ref">98 – 107 mEq/L</div></div>
+                <div class="row"><div class="param">Cálcio</div><div><input></div><div class="ref">8,8 – 11 mg/dL</div></div>
+                <div class="row"><div class="param">Magnésio</div><div><input></div><div class="ref">1,9 – 2,5 mg/dL</div></div>
+            </div>
+        </article>
+
+        <!-- FUNÇÃO HEPÁTICA -->
+        <article class="exam-card">
+            <h2 class="card-title">FUNÇÃO HEPÁTICA</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
+
+                <div class="row"><div class="param">TGO (AST)</div><div><input></div><div class="ref">Homens ≤39 U/L
 Mulheres ≤37 U/L</div></div>
-                    <div class="row"><div class="param">TGP (ALT)</div><div class="result"><input type="text"></div><div class="ref">Homens ≤45 U/L
+
+                <div class="row"><div class="param">TGP (ALT)</div><div><input></div><div class="ref">Homens ≤45 U/L
 Mulheres ≤37 U/L</div></div>
-                    <div class="row"><div class="param">GGT</div><div class="result"><input type="text"></div><div class="ref">Homens 7 – 45 U/L
+
+                <div class="row"><div class="param">GGT</div><div><input></div><div class="ref">Homens 7 – 45 U/L
 Mulheres 5 – 27 U/L</div></div>
-                    <div class="row"><div class="param">Fosfatase Alcalina</div><div class="result"><input type="text"></div><div class="ref">27 – 100 U/L</div></div>
-                    <div class="row"><div class="param">Bilirrubina Total</div><div class="result"><input type="text"></div><div class="ref">≤1,2 mg/dL</div></div>
-                    <div class="row"><div class="param">Direta</div><div class="result"><input type="text"></div><div class="ref">≤0,4 mg/dL</div></div>
-                    <div class="row"><div class="param">Indireta</div><div class="result"><input type="text"></div><div class="ref">≤0,8 mg/dL</div></div>
-                </div>
-            </article>
 
-            <article class="exam-card">
-                <h2 class="card-title">MARCADORES CARDÍACOS</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">CK Total</div><div class="result"><input type="text"></div><div class="ref">Homens ≤190 U/L
+                <div class="row"><div class="param">Fosfatase Alcalina</div><div><input></div><div class="ref">27 – 100 U/L</div></div>
+
+                <div class="row"><div class="param">Bilirrubina Total</div><div><input></div><div class="ref">≤1,2 mg/dL</div></div>
+                <div class="row"><div class="param">Direta</div><div><input></div><div class="ref">≤0,4 mg/dL</div></div>
+                <div class="row"><div class="param">Indireta</div><div><input></div><div class="ref">≤0,8 mg/dL</div></div>
+            </div>
+        </article>
+
+        <!-- MARCADORES -->
+        <article class="exam-card">
+            <h2 class="card-title">MARCADORES CARDÍACOS</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
+
+                <div class="row"><div class="param">CK Total</div><div><input></div><div class="ref">Homens ≤190 U/L
 Mulheres ≤170 U/L</div></div>
-                    <div class="row"><div class="param">CK-MB</div><div class="result"><input type="text"></div><div class="ref">≤24 U/L</div></div>
-                    <div class="row"><div class="param">Troponina T</div><div class="result"><input type="text"></div><div class="ref">&lt; 50 ng/L</div></div>
-                </div>
-            </article>
 
-            <article class="exam-card">
-                <h2 class="card-title">COAGULOGRAMA</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">TP</div><div class="result"><input type="text"></div><div class="ref">12 – 15,5 s</div></div>
-                    <div class="row"><div class="param">Atividade</div><div class="result"><input type="text"></div><div class="ref">≥70%</div></div>
-                    <div class="row"><div class="param">INR</div><div class="result"><input type="text"></div><div class="ref">padrão</div></div>
-                    <div class="row"><div class="param">TTPA</div><div class="result"><input type="text"></div><div class="ref">24 – 39 s</div></div>
-                </div>
-            </article>
+                <div class="row"><div class="param">CK-MB</div><div><input></div><div class="ref">≤24 U/L</div></div>
 
-            <article class="exam-card">
-                <h2 class="card-title">GASOMETRIA ARTERIAL</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">pH</div><div class="result"><input type="text"></div><div class="ref">7,34 – 7,44</div></div>
-                    <div class="row"><div class="param">PO2</div><div class="result"><input type="text"></div><div class="ref">75 – 100 mmHg</div></div>
-                    <div class="row"><div class="param">PCO2</div><div class="result"><input type="text"></div><div class="ref">35 – 45 mmHg</div></div>
-                    <div class="row"><div class="param">HCO3</div><div class="result"><input type="text"></div><div class="ref">22 – 26 mEq/L</div></div>
-                    <div class="row"><div class="param">SatO2</div><div class="result"><input type="text"></div><div class="ref">95 – 98%</div></div>
-                </div>
-            </article>
+                <div class="row"><div class="param">Troponina T</div><div><input></div><div class="ref">&lt; 50 ng/L</div></div>
+            </div>
+        </article>
 
-            <article class="exam-card">
-                <h2 class="card-title">GASOMETRIA VENOSA</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">pH</div><div class="result"><input type="text"></div><div class="ref">7,31 – 7,41</div></div>
-                    <div class="row"><div class="param">PO2</div><div class="result"><input type="text"></div><div class="ref">30 – 50 mmHg</div></div>
-                    <div class="row"><div class="param">PCO2</div><div class="result"><input type="text"></div><div class="ref">42 – 55 mmHg</div></div>
-                    <div class="row"><div class="param">HCO3</div><div class="result"><input type="text"></div><div class="ref">24 – 28 mEq/L</div></div>
-                    <div class="row"><div class="param">SatO2</div><div class="result"><input type="text"></div><div class="ref">60 – 85%</div></div>
-                </div>
-            </article>
+        <!-- COAGULOGRAMA -->
+        <article class="exam-card">
+            <h2 class="card-title">COAGULOGRAMA</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
 
-            <article class="exam-card">
-                <h2 class="card-title">SOROLOGIAS</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">COVID-19</div><div class="result"><input type="text"></div><div class="ref">Negativo</div></div>
-                    <div class="row"><div class="param">Influenza A/B</div><div class="result"><input type="text"></div><div class="ref">Negativo</div></div>
-                    <div class="row"><div class="param">Dengue NS1</div><div class="result"><input type="text"></div><div class="ref">Negativo</div></div>
-                    <div class="row"><div class="param">HIV 1/2</div><div class="result"><input type="text"></div><div class="ref">Negativo</div></div>
-                    <div class="row"><div class="param">HBsAg</div><div class="result"><input type="text"></div><div class="ref">Negativo</div></div>
-                    <div class="row"><div class="param">Anti-HCV</div><div class="result"><input type="text"></div><div class="ref">Negativo</div></div>
-                    <div class="row"><div class="param">VDRL</div><div class="result"><input type="text"></div><div class="ref">Negativo</div></div>
-                    <div class="row"><div class="param">Beta-HCG</div><div class="result"><input type="text"></div><div class="ref">Positivo / Negativo</div></div>
-                </div>
-            </article>
+                <div class="row"><div class="param">TP</div><div><input></div><div class="ref">12 – 15,5 s</div></div>
+                <div class="row"><div class="param">Atividade</div><div><input></div><div class="ref">≥70%</div></div>
+                <div class="row"><div class="param">INR</div><div><input></div><div class="ref">INR padrão</div></div>
+                <div class="row"><div class="param">TTPA</div><div><input></div><div class="ref">24 – 39 s</div></div>
+            </div>
+        </article>
 
-            <article class="exam-card">
-                <h2 class="card-title">OUTROS EXAMES</h2>
-                <div class="card-content">
-                    <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
-                    <div class="row"><div class="param">Hemoglobina glicada</div><div class="result"><input type="text"></div><div class="ref">4,0 – 6,3%</div></div>
-                    <div class="row"><div class="param">D-Dímero</div><div class="result"><input type="text"></div><div class="ref">&lt; 0,5 µg/mL</div></div>
-                    <div class="row"><div class="param">VHS</div><div class="result"><input type="text"></div><div class="ref">4 – 10 mm</div></div>
-                </div>
-            </article>
-        </section>
-    </main>
+        <!-- GASOMETRIA ARTERIAL -->
+        <article class="exam-card">
+            <h2 class="card-title">GASOMETRIA ARTERIAL</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
+
+                <div class="row"><div class="param">pH</div><div><input></div><div class="ref">7,34 – 7,44</div></div>
+                <div class="row"><div class="param">PO2</div><div><input></div><div class="ref">75 – 100 mmHg</div></div>
+                <div class="row"><div class="param">PCO2</div><div><input></div><div class="ref">35 – 45 mmHg</div></div>
+                <div class="row"><div class="param">HCO3</div><div><input></div><div class="ref">22 – 26 mEq/L</div></div>
+                <div class="row"><div class="param">SatO2</div><div><input></div><div class="ref">95 – 98%</div></div>
+            </div>
+        </article>
+
+        <!-- GASOMETRIA VENOSA -->
+        <article class="exam-card">
+            <h2 class="card-title">GASOMETRIA VENOSA</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
+
+                <div class="row"><div class="param">pH</div><div><input></div><div class="ref">7,31 – 7,41</div></div>
+                <div class="row"><div class="param">PO2</div><div><input></div><div class="ref">30 – 50 mmHg</div></div>
+                <div class="row"><div class="param">PCO2</div><div><input></div><div class="ref">42 – 55 mmHg</div></div>
+                <div class="row"><div class="param">HCO3</div><div><input></div><div class="ref">24 – 28 mEq/L</div></div>
+                <div class="row"><div class="param">SatO2</div><div><input></div><div class="ref">60 – 85%</div></div>
+            </div>
+        </article>
+
+        <!-- SOROLOGIAS -->
+        <article class="exam-card">
+            <h2 class="card-title">SOROLOGIAS</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Exame</span><span>Resultado</span><span>Referência</span></div>
+
+                <div class="row"><div class="param">COVID-19</div><div><select><option>Negativo</option><option>Positivo</option></select></div><div class="ref">Negativo</div></div>
+                <div class="row"><div class="param">Influenza A/B</div><div><select><option>Negativo</option><option>Positivo</option></select></div><div class="ref">Negativo</div></div>
+                <div class="row"><div class="param">Dengue NS1</div><div><select><option>Negativo</option><option>Positivo</option></select></div><div class="ref">Negativo</div></div>
+                <div class="row"><div class="param">HIV 1/2</div><div><select><option>Negativo</option><option>Positivo</option></select></div><div class="ref">Negativo</div></div>
+                <div class="row"><div class="param">HBsAg</div><div><select><option>Negativo</option><option>Positivo</option></select></div><div class="ref">Negativo</div></div>
+                <div class="row"><div class="param">Anti-HCV</div><div><select><option>Negativo</option><option>Positivo</option></select></div><div class="ref">Negativo</div></div>
+                <div class="row"><div class="param">VDRL</div><div><select><option>Negativo</option><option>Positivo</option></select></div><div class="ref">Negativo</div></div>
+                <div class="row"><div class="param">Beta-HCG</div><div><select><option>Negativo</option><option>Positivo</option></select></div><div class="ref">Positivo / Negativo</div></div>
+            </div>
+        </article>
+
+        <!-- OUTROS -->
+        <article class="exam-card">
+            <h2 class="card-title">OUTROS EXAMES</h2>
+            <div class="card-content">
+                <div class="table-header"><span>Parâmetro</span><span>Resultado</span><span>Referência</span></div>
+
+                <div class="row"><div class="param">Hemoglobina glicada</div><div><input></div><div class="ref">4,0 – 6,3%</div></div>
+                <div class="row"><div class="param">D-Dímero</div><div><input></div><div class="ref">&lt; 0,5 µg/mL</div></div>
+                <div class="row"><div class="param">VHS</div><div><input></div><div class="ref">4 – 10 mm</div></div>
+            </div>
+        </article>
+
+    </section>
+ </main>
+
+    <script>
+        (function () {
+            const headerFields = Array.from(document.querySelectorAll('.header-grid .field'));
+            const getFieldInputByLabel = (labelText) => {
+                const field = headerFields.find((item) => {
+                    const label = item.querySelector('label');
+                    return label && label.textContent.trim().toLowerCase() === labelText.toLowerCase();
+                });
+                return field ? field.querySelector('input') : null;
+            };
+
+            const formatDateBR = (date) => {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            };
+
+            const formatTimeBR = (date) => {
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${hours}:${minutes}`;
+            };
+
+            const toISODate = (date) => {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${year}-${month}-${day}`;
+            };
+
+            const dateInput = getFieldInputByLabel('Data');
+            const timeInput = getFieldInputByLabel('Horário');
+            const now = new Date();
+
+            if (dateInput && !dateInput.value) {
+                dateInput.value = toISODate(now);
+            }
+
+            if (timeInput && !timeInput.value) {
+                timeInput.value = formatTimeBR(now);
+            }
+
+            const headerCard = document.querySelector('.header-card');
+            const generateButton = document.createElement('button');
+            generateButton.type = 'button';
+            generateButton.textContent = 'Gerar PDF';
+            generateButton.setAttribute('aria-label', 'Gerar PDF');
+
+            if (headerCard) {
+                headerCard.appendChild(generateButton);
+            }
+
+            const examCategoryMatchers = [
+                { regex: /troponina|ck\s*-?mb|marcadores\s*card/i, category: 'Marcadores Cardíacos' },
+                { regex: /hemograma/i, category: 'Hemograma' },
+                { regex: /urina/i, category: 'Urina Tipo I' },
+                { regex: /eletr[oó]litos/i, category: 'Eletrólitos' },
+                { regex: /bioqu[ií]mica|fun[çc][aã]o\s+hep[aá]tica/i, category: 'Bioquímica' },
+                { regex: /gasometria/i, category: 'Gasometria' }
+            ];
+
+            const pickCategory = (title) => {
+                const match = examCategoryMatchers.find((item) => item.regex.test(title));
+                return match ? match.category : title;
+            };
+
+            const sanitize = (value) =>
+                String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+
+            const formatDateValue = (value) => {
+                if (!value || !value.includes('-')) {
+                    return value || '';
+                }
+                const parts = value.split('-');
+                if (parts.length !== 3) {
+                    return value;
+                }
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            };
+
+            const collectHeaderData = () => {
+                return headerFields
+                    .map((field) => {
+                        const label = field.querySelector('label');
+                        const input = field.querySelector('input');
+                        if (!label || !input) {
+                            return null;
+                        }
+                        const raw = input.value.trim();
+                        if (!raw) {
+                            return null;
+                        }
+                        const isDate = input.type === 'date';
+                        return {
+                            label: label.textContent.trim(),
+                            value: isDate ? formatDateValue(raw) : raw
+                        };
+                    })
+                    .filter(Boolean);
+            };
+
+            const collectExamData = () => {
+                const sections = Array.from(document.querySelectorAll('.exam-card')).map((card) => {
+                    const title = card.querySelector('.card-title')?.textContent.trim() || 'Exame';
+                    const rows = Array.from(card.querySelectorAll('.row'))
+                        .map((row) => {
+                            const param = row.querySelector('.param')?.textContent.trim() || '';
+                            const resultInput = row.querySelector('.result input');
+                            const result = resultInput ? resultInput.value.trim() : '';
+                            if (!result) {
+                                return null;
+                            }
+                            const ref = row.querySelector('.ref')?.textContent.trim() || '';
+                            return { param, result, ref };
+                        })
+                        .filter(Boolean);
+
+                    if (!rows.length) {
+                        return null;
+                    }
+
+                    return {
+                        category: pickCategory(title),
+                        title,
+                        rows
+                    };
+                }).filter(Boolean);
+
+                const grouped = sections.reduce((acc, section) => {
+                    if (!acc[section.category]) {
+                        acc[section.category] = [];
+                    }
+                    acc[section.category].push(section);
+                    return acc;
+                }, {});
+
+                return grouped;
+            };
+
+            const buildPdfHtml = () => {
+                const headerData = collectHeaderData();
+                const groupedExams = collectExamData();
+                const generatedAt = `Emitido em ${formatDateBR(new Date())} às ${formatTimeBR(new Date())}`;
+
+                const headerHtml = headerData.length
+                    ? `<section><h2>Dados do Paciente</h2><div class="meta">${headerData
+                          .map((item) => `<p><strong>${sanitize(item.label)}:</strong> ${sanitize(item.value)}</p>`)
+                          .join('')}</div></section>`
+                    : '';
+
+                const sectionsHtml = Object.entries(groupedExams)
+                    .map(([category, sections]) => {
+                        const examsHtml = sections
+                            .map((exam) => `
+                                <article>
+                                    <h4>${sanitize(exam.title)}</h4>
+                                    <table>
+                                        <thead>
+                                            <tr><th>Parâmetro</th><th>Resultado</th><th>Referência</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            ${exam.rows
+                                                .map(
+                                                    (row) => `
+                                                <tr>
+                                                    <td>${sanitize(row.param)}</td>
+                                                    <td>${sanitize(row.result)}</td>
+                                                    <td>${sanitize(row.ref)}</td>
+                                                </tr>`
+                                                )
+                                                .join('')}
+                                        </tbody>
+                                    </table>
+                                </article>`)
+                            .join('');
+                        return `<section><h3>${sanitize(category)}</h3>${examsHtml}</section>`;
+                    })
+                    .join('');
+
+                return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Laudo Laboratorial</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 24px; color: #111; }
+h1 { text-align: center; margin-bottom: 8px; }
+p { margin: 3px 0; }
+h2, h3, h4 { margin: 14px 0 8px; }
+h3 { border-bottom: 1px solid #bbb; padding-bottom: 4px; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 12px; text-align: left; vertical-align: top; }
+.meta { margin-bottom: 10px; }
+.footer { margin-top: 18px; font-size: 11px; color: #444; }
+@media print { body { margin: 12mm; } }
+</style>
+</head>
+<body>
+<h1>Laudo Laboratorial</h1>
+${headerHtml}
+${sectionsHtml || '<p>Nenhum exame preenchido.</p>'}
+<p class="footer">${sanitize(generatedAt)}</p>
+<script>
+window.onload = function() {
+    window.print();
+};
+<\/script>
+</body>
+</html>`;
+            };
+
+            generateButton.addEventListener('click', () => {
+                const printWindow = window.open('', '_blank');
+                if (!printWindow) {
+                    return;
+                }
+                printWindow.document.open();
+                printWindow.document.write(buildPdfHtml());
+                printWindow.document.close();
+            });
+        })();
+    </script>
+
 </body>
 </html>
