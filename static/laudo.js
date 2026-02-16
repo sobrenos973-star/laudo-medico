@@ -28,6 +28,30 @@
         if (timeInput && !timeInput.value) timeInput.value = formatTimeBR(now);
     };
 
+    const addObservationFields = () => {
+        examCards.forEach((card, index) => {
+            const cardBody = card.querySelector('.card-body');
+            if (!cardBody || cardBody.querySelector('.exam-observation')) return;
+
+            const wrap = document.createElement('div');
+            wrap.className = 'exam-note-wrap';
+
+            const label = document.createElement('label');
+            label.className = 'form-label text-uppercase text-muted fw-semibold mb-1';
+            label.setAttribute('for', `obs-${index}`);
+            label.textContent = 'Observação';
+
+            const textarea = document.createElement('textarea');
+            textarea.className = 'form-control form-control-sm exam-observation';
+            textarea.id = `obs-${index}`;
+            textarea.placeholder = 'Opcional';
+
+            wrap.appendChild(label);
+            wrap.appendChild(textarea);
+            cardBody.appendChild(wrap);
+        });
+    };
+
     const convertSorologyInputsToSelect = () => {
         const sorologyCard = examCards.find((card) => {
             const header = card.querySelector('.card-header')?.textContent || '';
@@ -68,7 +92,8 @@
             atendimento: 'Atendimento',
             data: 'Data',
             horario: 'Horário',
-            liberado_por: 'Liberado por'
+            liberado_por: 'Liberado por',
+            crm: 'CRM'
         };
 
         return headerInputs
@@ -103,7 +128,11 @@
                 })
                 .filter(Boolean);
 
-            if (rows.length) sections.push({ title, rows });
+            const observation = card.querySelector('.exam-observation')?.value.trim() || '';
+
+            if (rows.length || observation) {
+                sections.push({ title, rows, observation });
+            }
         });
 
         return sections;
@@ -120,8 +149,10 @@
         }, {});
 
         const patientName = headerMap.nome_paciente || 'Não informado';
+        const doctorName = headerMap.liberado_por || 'Não informado';
+        const crm = headerMap.crm || 'Não informado';
 
-        const optionalHeaderFields = headerData.filter((item) => !['nome_paciente', 'data', 'horario'].includes(item.key));
+        const optionalHeaderFields = headerData.filter((item) => !['nome_paciente', 'data', 'horario', 'liberado_por', 'crm'].includes(item.key));
 
         const optionalHeaderHtml = optionalHeaderFields.length
             ? `<div class="patient-grid">${optionalHeaderFields
@@ -130,19 +161,33 @@
             : '';
 
         const sectionsHtml = examSections.length
-            ? examSections.map((section) => `
-                <section class="exam-section">
-                    <h2>${escapeHtml(section.title)}</h2>
-                    <div class="exam-list">
-                        ${section.rows.map((row) => `
-                            <article class="exam-item">
-                                <p class="exam-result"><strong>${escapeHtml(row.examName)}:</strong> ${escapeHtml(row.result)}</p>
-                                <p class="exam-reference"><strong>Referência:</strong> ${escapeHtml(row.reference || 'Não informada')}</p>
-                            </article>
-                        `).join('')}
-                    </div>
-                </section>
-            `).join('')
+            ? examSections
+                .map((section) => {
+                    const hasRows = section.rows.length > 0;
+                    const rowsHtml = hasRows
+                        ? `<div class="exam-list">
+                            ${section.rows.map((row) => `
+                                <article class="exam-item">
+                                    <p class="exam-result"><strong>${escapeHtml(row.examName)}:</strong> ${escapeHtml(row.result)}</p>
+                                    <p class="exam-reference"><strong>Referência:</strong> ${escapeHtml(row.reference || 'Não informada')}</p>
+                                </article>
+                            `).join('')}
+                        </div>`
+                        : '';
+
+                    const observationHtml = section.observation
+                        ? `<div class="exam-observation-block"><p><strong>Observação:</strong></p><p>${escapeHtml(section.observation)}</p></div>`
+                        : '';
+
+                    return `
+                        <section class="exam-section">
+                            <h2>${escapeHtml(section.title)}</h2>
+                            ${rowsHtml}
+                            ${observationHtml}
+                        </section>
+                    `;
+                })
+                .join('')
             : '<p class="empty-msg">Nenhum exame preenchido para emissão do laudo.</p>';
 
         return `<!DOCTYPE html>
@@ -163,7 +208,7 @@
     .laudo-wrap {
         max-width: 920px;
         margin: 0 auto;
-        border: 1px solid #d1d5db;
+        border: 1px solid #d1dbe4;
         padding: 28px;
         background: #fff;
     }
@@ -183,7 +228,7 @@
         cursor: pointer;
     }
     .institution-header {
-        border-bottom: 2px solid #9ca3af;
+        border-bottom: 2px solid #8ba1b5;
         padding-bottom: 12px;
         margin-bottom: 18px;
     }
@@ -192,13 +237,14 @@
         font-size: 28px;
         letter-spacing: .03em;
         text-transform: uppercase;
-        color: #111827;
+        color: #1f3b56;
     }
     .header-line {
         margin: 4px 0;
         font-size: 14px;
     }
-    .header-line .label {
+    .header-line .label,
+    .patient-item .label {
         font-weight: 700;
     }
     .block-title {
@@ -206,8 +252,9 @@
         font-size: 15px;
         font-weight: 700;
         text-transform: uppercase;
-        border-bottom: 1px solid #d1d5db;
+        border-bottom: 1px solid #d1dbe4;
         padding-bottom: 6px;
+        color: #1f3b56;
     }
     .patient-grid {
         display: grid;
@@ -215,24 +262,39 @@
         gap: 8px 16px;
     }
     .patient-item { font-size: 14px; }
-    .patient-item .label { font-weight: 700; }
-    .exam-section { margin-bottom: 16px; break-inside: avoid; }
+    .exam-section { margin-bottom: 16px; break-inside: avoid; page-break-inside: avoid; }
     .exam-section h2 {
         margin: 0 0 8px;
         font-size: 14px;
         font-weight: 700;
         text-transform: uppercase;
+        color: #1f3b56;
     }
     .exam-list {
-        border: 1px solid #d1d5db;
+        border: 1px solid #d1dbe4;
+        background: #fff;
     }
     .exam-item {
         padding: 10px 12px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5eaf0;
         font-size: 14px;
     }
     .exam-item:last-child { border-bottom: 0; }
-    .exam-item p { margin: 2px 0; }
+    .exam-item p,
+    .exam-observation-block p { margin: 2px 0; }
+    .exam-observation-block {
+        margin-top: 10px;
+        border-left: 3px solid #d1dbe4;
+        padding: 8px 10px;
+        background: #f8fafc;
+        font-size: 14px;
+    }
+    .medical-sign {
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 1px solid #d1dbe4;
+        font-size: 14px;
+    }
     .empty-msg { margin: 10px 0; font-style: italic; }
     @page {
         size: A4;
@@ -265,6 +327,11 @@
         <section>
             <h2 class="block-title">Exames Preenchidos</h2>
             ${sectionsHtml}
+        </section>
+
+        <section class="medical-sign">
+            <p><strong>Liberado por:</strong> ${escapeHtml(doctorName)}</p>
+            <p><strong>CRM:</strong> ${escapeHtml(crm)}</p>
         </section>
     </main>
 
@@ -306,4 +373,5 @@
 
     fillDateTime();
     convertSorologyInputsToSelect();
+    addObservationFields();
 })();
