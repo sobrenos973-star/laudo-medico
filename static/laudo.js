@@ -7,44 +7,6 @@
     const formatTimeBR = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
     const toISODate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-    const toNumber = (value) => {
-        if (!value) return null;
-        const matched = String(value).match(/-?\d+[\d.,]*/);
-        if (!matched) return null;
-
-        let raw = matched[0].replace(/\s/g, '');
-        if (raw.includes('.') && raw.includes(',')) raw = raw.replace(/\./g, '').replace(',', '.');
-        else if (raw.includes(',') && !raw.includes('.')) raw = raw.replace(',', '.');
-        else if (raw.includes('.') && /\.\d{3}(?:\.|$)/.test(raw)) raw = raw.replace(/\./g, '');
-
-        const parsed = Number(raw);
-        return Number.isFinite(parsed) ? parsed : null;
-    };
-
-    const parseReferenceRange = (text) => {
-        if (!text) return null;
-        const line = text.split('\n')[0].replace(/\s+/g, ' ').trim();
-
-        const rangeMatch = line.match(/(-?\d+[\d.,]*)\s*(?:–|-|a|até)\s*(-?\d+[\d.,]*)/i);
-        if (rangeMatch) return { min: toNumber(rangeMatch[1]), max: toNumber(rangeMatch[2]) };
-
-        const lteMatch = line.match(/(?:≤|<=|<)\s*(-?\d+[\d.,]*)/);
-        if (lteMatch) return { min: null, max: toNumber(lteMatch[1]) };
-
-        const gteMatch = line.match(/(?:≥|>=|>)\s*(-?\d+[\d.,]*)/);
-        if (gteMatch) return { min: toNumber(gteMatch[1]), max: null };
-
-        return null;
-    };
-
-    const evaluateStatus = (resultText, refText) => {
-        const value = toNumber(resultText);
-        const range = parseReferenceRange(refText);
-        if (value === null || !range) return 'NORMAL';
-        if ((range.min !== null && value < range.min) || (range.max !== null && value > range.max)) return 'ALTERADO';
-        return 'NORMAL';
-    };
-
     const formatDateValue = (value) => {
         if (!value || !value.includes('-')) return value || '';
         const parts = value.split('-');
@@ -64,6 +26,39 @@
         const timeInput = document.querySelector('[data-header-field="horario"]');
         if (dateInput && !dateInput.value) dateInput.value = toISODate(now);
         if (timeInput && !timeInput.value) timeInput.value = formatTimeBR(now);
+    };
+
+    const convertSorologyInputsToSelect = () => {
+        const sorologyCard = examCards.find((card) => {
+            const header = card.querySelector('.card-header')?.textContent || '';
+            return header.trim().toUpperCase() === 'SOROLOGIAS';
+        });
+
+        if (!sorologyCard) return;
+
+        const inputs = Array.from(sorologyCard.querySelectorAll('input.exam-input'));
+        inputs.forEach((input) => {
+            const select = document.createElement('select');
+            select.className = input.className;
+
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = '';
+
+            const negativeOption = document.createElement('option');
+            negativeOption.value = 'Negativo';
+            negativeOption.textContent = 'Negativo';
+
+            const positiveOption = document.createElement('option');
+            positiveOption.value = 'Positivo';
+            positiveOption.textContent = 'Positivo';
+
+            select.appendChild(emptyOption);
+            select.appendChild(negativeOption);
+            select.appendChild(positiveOption);
+
+            input.replaceWith(select);
+        });
     };
 
     const collectHeaderData = () => {
@@ -104,12 +99,7 @@
                     if (!result) return null;
 
                     const reference = row.querySelector('.ref-text')?.textContent.trim() || '';
-                    return {
-                        examName,
-                        result,
-                        reference,
-                        status: evaluateStatus(result, reference)
-                    };
+                    return { examName, result, reference };
                 })
                 .filter(Boolean);
 
@@ -121,13 +111,23 @@
 
     const buildLaudoHtml = (headerData, examSections) => {
         const now = new Date();
-        const generatedDateTime = `${formatDateBR(now)} — ${formatTimeBR(now)}`;
+        const autoDate = formatDateBR(now);
+        const autoTime = formatTimeBR(now);
 
-        const headerItems = headerData.length
-            ? `<div class="patient-grid">${headerData
+        const headerMap = headerData.reduce((acc, item) => {
+            acc[item.key] = item.value;
+            return acc;
+        }, {});
+
+        const patientName = headerMap.nome_paciente || 'Não informado';
+
+        const optionalHeaderFields = headerData.filter((item) => !['nome_paciente', 'data', 'horario'].includes(item.key));
+
+        const optionalHeaderHtml = optionalHeaderFields.length
+            ? `<div class="patient-grid">${optionalHeaderFields
                 .map((item) => `<div class="patient-item"><span class="label">${escapeHtml(item.label)}:</span> <span class="value">${escapeHtml(item.value)}</span></div>`)
                 .join('')}</div>`
-            : '<p class="empty-msg">Nenhum dado de identificação preenchido.</p>';
+            : '';
 
         const sectionsHtml = examSections.length
             ? examSections.map((section) => `
@@ -136,9 +136,8 @@
                     <div class="exam-list">
                         ${section.rows.map((row) => `
                             <article class="exam-item">
-                                <p><strong>${escapeHtml(row.examName)}:</strong> ${escapeHtml(row.result)}</p>
-                                <p><strong>Referência:</strong> ${escapeHtml(row.reference || 'Não informada')}</p>
-                                <p><strong>Status:</strong> ${escapeHtml(row.status)}</p>
+                                <p class="exam-result"><strong>${escapeHtml(row.examName)}:</strong> ${escapeHtml(row.result)}</p>
+                                <p class="exam-reference"><strong>Referência:</strong> ${escapeHtml(row.reference || 'Não informada')}</p>
                             </article>
                         `).join('')}
                     </div>
@@ -151,130 +150,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laudo Clínico</title>
+<title>Laudo Laboratorial</title>
 <style>
     * { box-sizing: border-box; }
     body {
         margin: 0;
         padding: 24px;
-        font-family: "Arial", "Helvetica", sans-serif;
-        background: #f5f7fa;
-        color: #1f2933;
+        font-family: "Segoe UI", "Arial", sans-serif;
+        background: #ffffff;
+        color: #1f2937;
     }
     .laudo-wrap {
-        max-width: 900px;
+        max-width: 920px;
         margin: 0 auto;
-        background: #fff;
-        border: 1px solid #d9e2ec;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        border: 1px solid #d1d5db;
         padding: 28px;
+        background: #fff;
     }
     .top-bar {
         display: flex;
         justify-content: flex-end;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
     }
     .print-btn {
-        border: 0;
-        border-radius: 6px;
-        padding: 10px 16px;
-        font-size: 14px;
+        border: 1px solid #1f2937;
+        border-radius: 4px;
+        padding: 9px 14px;
+        font-size: 13px;
         font-weight: 700;
+        background: #ffffff;
+        color: #111827;
         cursor: pointer;
-        background: #1f5d99;
-        color: #fff;
     }
-    h1 {
+    .institution-header {
+        border-bottom: 2px solid #9ca3af;
+        padding-bottom: 12px;
+        margin-bottom: 18px;
+    }
+    .institution-header h1 {
         margin: 0 0 8px;
-        font-size: 26px;
-        letter-spacing: 0.04em;
+        font-size: 28px;
+        letter-spacing: .03em;
         text-transform: uppercase;
-        color: #123a5c;
+        color: #111827;
     }
-    .generated {
-        margin: 0 0 24px;
+    .header-line {
+        margin: 4px 0;
         font-size: 14px;
-        color: #52606d;
+    }
+    .header-line .label {
+        font-weight: 700;
     }
     .block-title {
-        margin: 0 0 12px;
-        font-size: 16px;
+        margin: 20px 0 10px;
+        font-size: 15px;
+        font-weight: 700;
         text-transform: uppercase;
-        color: #334e68;
-        border-bottom: 1px solid #d9e2ec;
+        border-bottom: 1px solid #d1d5db;
         padding-bottom: 6px;
     }
     .patient-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 8px 18px;
-        margin-bottom: 28px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 8px 16px;
     }
-    .patient-item {
-        font-size: 14px;
-        line-height: 1.45;
-    }
-    .patient-item .label {
-        color: #486581;
-        font-weight: 700;
-    }
-    .exam-section {
-        margin-bottom: 22px;
-        break-inside: avoid;
-    }
+    .patient-item { font-size: 14px; }
+    .patient-item .label { font-weight: 700; }
+    .exam-section { margin-bottom: 16px; break-inside: avoid; }
     .exam-section h2 {
-        margin: 0 0 10px;
-        color: #102a43;
-        font-size: 15px;
+        margin: 0 0 8px;
+        font-size: 14px;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: .03em;
     }
     .exam-list {
-        border: 1px solid #d9e2ec;
-        border-radius: 4px;
+        border: 1px solid #d1d5db;
     }
     .exam-item {
         padding: 10px 12px;
-        border-bottom: 1px solid #e4ebf1;
+        border-bottom: 1px solid #e5e7eb;
         font-size: 14px;
     }
-    .exam-item:last-child {
-        border-bottom: 0;
-    }
-    .exam-item p {
-        margin: 4px 0;
-    }
-    .empty-msg {
-        margin: 10px 0 24px;
-        color: #7b8794;
-        font-style: italic;
-    }
-
+    .exam-item:last-child { border-bottom: 0; }
+    .exam-item p { margin: 2px 0; }
+    .empty-msg { margin: 10px 0; font-style: italic; }
     @page {
         size: A4;
         margin: 14mm;
     }
-
     @media print {
-        body {
-            background: #fff !important;
-            padding: 0;
-        }
-        .laudo-wrap {
-            max-width: none;
-            border: 0;
-            box-shadow: none;
-            padding: 0;
-        }
-        .top-bar {
-            display: none !important;
-        }
-        .exam-section,
-        .exam-list,
-        .exam-item {
-            break-inside: avoid;
-            page-break-inside: avoid;
-        }
+        body { padding: 0; background: #fff !important; }
+        .laudo-wrap { border: 0; padding: 0; max-width: none; }
+        .top-bar { display: none !important; }
+        .exam-section, .exam-list, .exam-item { break-inside: avoid; page-break-inside: avoid; }
     }
 </style>
 </head>
@@ -284,12 +252,14 @@
             <button id="print-laudo" class="print-btn" type="button">Imprimir Laudo</button>
         </div>
 
-        <h1>Laudo Clínico</h1>
-        <p class="generated">Emitido em: ${escapeHtml(generatedDateTime)}</p>
+        <header class="institution-header">
+            <h1>LAUDO LABORATORIAL</h1>
+            <p class="header-line"><span class="label">Nome do paciente:</span> ${escapeHtml(patientName)}</p>
+            <p class="header-line"><span class="label">Data:</span> ${escapeHtml(autoDate)} <span class="label" style="margin-left:16px;">Hora:</span> ${escapeHtml(autoTime)}</p>
+        </header>
 
         <section>
-            <h2 class="block-title">Identificação</h2>
-            ${headerItems}
+            ${optionalHeaderHtml}
         </section>
 
         <section>
@@ -315,16 +285,18 @@
     const generateLaudo = () => {
         const headerData = collectHeaderData();
         const examSections = collectExamData();
+        const laudoHtml = buildLaudoHtml(headerData, examSections);
 
-        const popup = window.open('', '_blank', 'noopener');
-        if (!popup) {
+        const popup = window.open('', '_blank');
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
             window.alert('Não foi possível abrir a nova guia para gerar o laudo.');
             return;
         }
 
-        popup.document.open();
-        popup.document.write(buildLaudoHtml(headerData, examSections));
+        popup.document.open('text/html', 'replace');
+        popup.document.write(laudoHtml);
         popup.document.close();
+        popup.focus();
     };
 
     if (generateBtn) {
@@ -333,4 +305,5 @@
     }
 
     fillDateTime();
+    convertSorologyInputsToSelect();
 })();
