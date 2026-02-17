@@ -149,10 +149,11 @@
         }, {});
 
         const patientName = headerMap.nome_paciente || 'Não informado';
+        const attendance = headerMap.atendimento || 'Não informado';
         const doctorName = headerMap.liberado_por || 'Não informado';
         const crm = headerMap.crm || 'Não informado';
 
-        const optionalHeaderFields = headerData.filter((item) => !['nome_paciente', 'data', 'horario', 'liberado_por', 'crm'].includes(item.key));
+        const optionalHeaderFields = headerData.filter((item) => !['nome_paciente', 'atendimento', 'data', 'horario', 'liberado_por', 'crm'].includes(item.key));
 
         const optionalHeaderHtml = optionalHeaderFields.length
             ? `<div class="patient-grid">${optionalHeaderFields
@@ -317,6 +318,7 @@
         <header class="institution-header">
             <h1>LAUDO LABORATORIAL</h1>
             <p class="header-line"><span class="label">Nome do paciente:</span> ${escapeHtml(patientName)}</p>
+            <p class="header-line"><span class="label">Atendimento:</span> ${escapeHtml(attendance)}</p>
             <p class="header-line"><span class="label">Data:</span> ${escapeHtml(autoDate)} <span class="label" style="margin-left:16px;">Hora:</span> ${escapeHtml(autoTime)}</p>
         </header>
 
