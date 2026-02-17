@@ -2,6 +2,7 @@
     const headerInputs = Array.from(document.querySelectorAll('[data-header-field]'));
     const examCards = Array.from(document.querySelectorAll('.exam-card'));
     const generateBtn = document.getElementById('generate-pdf');
+    const institutionLogo = document.querySelector('[data-institution-logo]');
 
     const formatDateBR = (date) => `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
     const formatTimeBR = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -139,6 +140,7 @@
     };
 
     const buildLaudoHtml = (headerData, examSections) => {
+        const logoSrc = institutionLogo?.getAttribute('src') || '';
         const now = new Date();
         const autoDate = formatDateBR(now);
         const autoTime = formatTimeBR(now);
@@ -233,6 +235,19 @@
         padding-bottom: 12px;
         margin-bottom: 18px;
     }
+    .institution-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 10px;
+    }
+    .institution-logo {
+        width: 170px;
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
     .institution-header h1 {
         margin: 0 0 8px;
         font-size: 28px;
@@ -306,6 +321,7 @@
         .laudo-wrap { border: 0; padding: 0; max-width: none; }
         .top-bar { display: none !important; }
         .exam-section, .exam-list, .exam-item { break-inside: avoid; page-break-inside: avoid; }
+        .institution-logo { width: 158px; }
     }
 </style>
 </head>
@@ -316,6 +332,9 @@
         </div>
 
         <header class="institution-header">
+            <div class="institution-top">
+                ${logoSrc ? `<img class="institution-logo" src="${escapeHtml(logoSrc)}" alt="Logo UPA 24h - Unidade de Pronto Atendimento">` : ''}
+            </div>
             <h1>LAUDO LABORATORIAL</h1>
             <p class="header-line"><span class="label">Nome do paciente:</span> ${escapeHtml(patientName)}</p>
             <p class="header-line"><span class="label">Atendimento:</span> ${escapeHtml(attendance)}</p>
