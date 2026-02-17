@@ -23,6 +23,24 @@
         }
         .page-title { color: var(--clinical-heading); letter-spacing: .04em; }
         .section-subtitle { color: var(--clinical-subtle); font-size: .9rem; }
+        .institution-brand {
+            display: flex;
+            align-items: center;
+            gap: .9rem;
+        }
+        .institution-logo {
+            width: 172px;
+            max-width: 100%;
+            height: auto;
+        }
+        .institution-name {
+            margin: 0;
+            font-size: .78rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--clinical-subtle);
+            font-weight: 700;
+        }
         .exam-card .card-header {
             background: var(--clinical-soft);
             color: var(--clinical-heading);
@@ -50,6 +68,9 @@
             min-height: 64px;
             resize: vertical;
         }
+        @media (max-width: 768px) {
+            .institution-logo { width: 144px; }
+        }
     </style>
 </head>
 <body>
@@ -58,6 +79,10 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
                     <div>
+                        <div class="institution-brand mb-2">
+                            <img class="institution-logo" data-institution-logo src="{{ url_for('static', filename='upa-24h-logo.png') }}" alt="Logo UPA 24h - Unidade de Pronto Atendimento">
+                            <p class="institution-name">Unidade de Pronto Atendimento</p>
+                        </div>
                         <h1 class="h3 fw-bold mb-1 page-title">LAUDO LABORATORIAL</h1>
                         <p class="mb-0 section-subtitle">Sistema clínico para consolidação de exames laboratoriais</p>
                     </div>
